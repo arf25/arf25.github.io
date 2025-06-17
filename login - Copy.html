@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -71,22 +70,22 @@
       color: red;
       text-align: center;
     }
+	
+	.tab-button {
+		user-select: none;        /* Prevent text highlighting */
+		outline: none;            /* Remove focus outline */
+	}
 
-    .tab-button {
-      user-select: none;
-      outline: none;
-    }
-
-    .tab-button:focus {
-      outline: none;
-    }
+	.tab-button:focus {
+		outline: none;            /* For browsers that apply focus styles */
+	}
   </style>
 </head>
 <body>
   <div class="top-header" id="typedHeader"></div>
 
   <div class="terminal-window">
-    <form onsubmit="return login(event);">
+    <form onsubmit="return login();">
       <label for="username">Username:</label>
       <input type="text" id="username" required />
 
@@ -102,13 +101,14 @@
   <script>
     const headerText = 'THE COMPANY';
     let i = 0;
+
     function typeHeader() {
       const target = document.getElementById("typedHeader");
       if (i < headerText.length) {
         target.innerHTML += headerText.charAt(i);
         if (i === 8) {
           i++;
-          setTimeout(typeHeader, 800);
+          setTimeout(typeHeader, 800); // pause after M
         } else {
           i++;
           setTimeout(typeHeader, 120);
@@ -116,41 +116,35 @@
       }
     }
 
-    window.onload = () => {
-      typeHeader();
+    const validUsers = {
+      'Austin': 'gamer',
+      'Baxter': 'naggingnancy',
+      'Fatman': 'oompaloompa',
+      'Ben': 'Dover'
     };
 
-    async function login(event) {
-      if (event) event.preventDefault();
+async function login() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
 
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-
-      try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbwhx3jc1hWGcDpZkHF9hEkS5lo5NH2c10Wdht4SGiMoO7ZWj_3x7GR4I-6tpN-J0ZcJ/exec", {
-          method: "POST",
-          body: JSON.stringify({ username, password }),
-          headers: {
-            "Content-Type": "application/json"
-          }
-        });
-
-        const text = await response.text();
-        let result = JSON.parse(text);
-
-        if (result.success) {
-          localStorage.setItem("loggedInUser", username);
-          window.location.href = "home.html";
-        } else {
-          document.getElementById("message").innerText = "Access Denied.";
-        }
-      } catch (err) {
-        console.error("Login error:", err);
-        document.getElementById("message").innerText = "Login error. See console.";
-      }
-
-      return false;
+  const response = await fetch("https://script.google.com/macros/s/AKfycbwhx3jc1hWGcDpZkHF9hEkS5lo5NH2c10Wdht4SGiMoO7ZWj_3x7GR4I-6tpN-J0ZcJ/exec", {
+    method: "POST",
+    body: JSON.stringify({ username, password }),
+    headers: {
+      "Content-Type": "application/json"
     }
-  </script>
+  });
+
+  const result = await response.json();
+  console.log("RAW response:", text);
+
+  if (result.success) {
+    localStorage.setItem("loggedInUser", username);
+    window.location.href = "home.html"; // ✅ Redirect to home.html
+  } else {
+    document.getElementById("message").innerText = "Access Denied.";
+  }
+}
+</script>
 </body>
 </html>
