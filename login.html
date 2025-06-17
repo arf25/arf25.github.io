@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - The Company</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      font-family: 'Courier New', Courier, monospace;
+      color: #0f0;
+    }
+
+    .top-header {
+      text-align: center;
+      font-size: 2.5em;
+      font-weight: bold;
+      color: #0f0;
+      padding: 40px 0 10px;
+      text-shadow: 0 0 3px #0f0;
+    }
+
+    .terminal-window {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 30px;
+      background-color: #000;
+      border: 1px solid #0f0;
+      box-shadow: 0 0 5px #0f0;
+      border-radius: 6px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    label {
+      color: #0f0;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #000;
+      border: 1px solid #0f0;
+      color: #0f0;
+      font-family: inherit;
+      font-size: 1em;
+      box-sizing: border-box;
+    }
+
+    button {
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #0f0;
+      color: #000;
+    }
+
+    #message {
+      margin-top: 10px;
+      color: red;
+      text-align: center;
+    }
+	
+	.tab-button {
+		user-select: none;        /* Prevent text highlighting */
+		outline: none;            /* Remove focus outline */
+	}
+
+	.tab-button:focus {
+		outline: none;            /* For browsers that apply focus styles */
+	}
+  </style>
+</head>
+<body>
+  <div class="top-header" id="typedHeader"></div>
+
+  <div class="terminal-window">
+    <form onsubmit="return login();">
+      <label for="username">Username:</label>
+      <input type="text" id="username" required />
+
+      <label for="password">Password:</label>
+      <input type="password" id="password" required />
+
+      <button type="submit">Login</button>
+
+      <div id="message"></div>
+    </form>
+  </div>
+
+  <script>
+    const headerText = 'THE COMPANY';
+    let i = 0;
+
+    function typeHeader() {
+      const target = document.getElementById("typedHeader");
+      if (i < headerText.length) {
+        target.innerHTML += headerText.charAt(i);
+        if (i === 8) {
+          i++;
+          setTimeout(typeHeader, 800); // pause after M
+        } else {
+          i++;
+          setTimeout(typeHeader, 120);
+        }
+      }
+    }
+
+    const validUsers = {
+      'Austin': 'gamer',
+      'Baxter': 'naggingnancy',
+      'Fatman': 'oompaloompa',
+      'Ben': 'Dover'
+    };
+
+    function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      if (validUsers[username] && validUsers[username] === password) {
+        localStorage.setItem('loggedInUser', username);
+        window.location.href = 'home.html';
+      } else {
+        document.getElementById('message').innerText = 'Access Denied.';
+      }
+      return false;
+    }
+
+    window.onload = () => {
+      typeHeader();
+    };
+  </script>
+</body>
+</html>
