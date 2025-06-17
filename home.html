@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Company</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      font-family: 'Courier New', Courier, monospace;
+      color: #0f0;
+    }
+
+    #bootScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      color: #0f0;
+      font-size: 14px;
+      padding: 20px;
+      z-index: 1000;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+    }
+
+    .header {
+      text-align: center;
+      padding: 40px 10px 20px;
+      font-size: 2.8em;
+      font-weight: bold;
+      color: #0f0;
+      text-shadow: 0 0 4px #0f0;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .tab-button {
+      padding: 12px 25px;
+      background: transparent;
+      color: #0f0;
+      border: 1px solid #0f0;
+      cursor: pointer;
+      font-size: 1em;
+      margin: 0 8px;
+      border-radius: 4px;
+      text-shadow: 0 0 4px #0f0;
+      box-shadow: 0 0 6px #0f0;
+      transition: background 0.3s ease;
+    }
+
+    .tab-button:hover {
+      background-color: #0f0;
+      color: #000;
+    }
+
+    .tab-content {
+      display: none;
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #111;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px #0f0;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    h2 {
+      text-shadow: 0 0 4px #0f0;
+      text-align: center;
+    }
+
+    .terminal-line {
+      margin: 10px 0;
+    }
+
+    .prompt {
+      color: #0f0;
+      margin-right: 5px;
+    }
+
+    #logoutBtn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 8px 16px;
+      background: #000;
+      color: #0f0;
+      border: 1px solid #0f0;
+      box-shadow: 0 0 6px #0f0;
+      cursor: pointer;
+    }
+
+    #logoutBtn:hover {
+      background: #0f0;
+      color: #000;
+    }
+
+    img {
+      max-width: 100%;
+      border: 1px solid #0f0;
+      box-shadow: 0 0 4px #0f0;
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="bootScreen"><div id="bootLog"></div></div>
+
+  <div class="header" id="typedHeader"></div>
+
+  <button id="logoutBtn" onclick="logout()">Logout</button>
+
+  <div class="tabs">
+    <button class="tab-button" onclick="showTab('home')">HOME</button>
+    <button class="tab-button" onclick="showTab('updates')">UPDATES</button>
+    <button class="tab-button" onclick="showTab('tasks')">TASKS</button>
+	<button class="tab-button" onclick="showTab('members')">MEMBERS</button>
+    <button class="tab-button" onclick="showTab('profile')">PROFILE</button>
+  </div>
+
+  <div class="tab-content" id="home">
+    <h2>Security Cam</h2>
+    <iframe width="100%" height="300" src="https://www.youtube.com/embed/sVXBgHGVdnk?si=wKfMPUmrKxBiGICC&amp;controls=0" title="YouTube video player" frameborder="0" mute="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  </div>
+
+  <div class="tab-content" id="updates">
+    <h2>Updates</h2>
+    <div id="bootLogUpdates" class="terminal-box" style="margin-top: 20px;"></div>
+  </div>
+
+  <div class="tab-content" id="tasks">
+    <h2>Tasks</h2>
+    <div id="taskLog" class="terminal-box" style="margin-top: 20px;"></div>
+  </div>
+  
+  <div class="tab-content" id="members">
+    <h2>Members</h2>
+    <div id="membersLog" class="terminal-box" style="margin-top: 20px;"></div>
+  </div>
+
+  <div class="tab-content" id="profile">
+    <h2>Profile</h2>
+    <div id="profileLog" class="terminal-box" style="margin-top: 20px;"></div>
+  </div>
+
+  <script>
+    const bootLines = [
+      "Initializing system...",
+      "Decrypting Syndicate Protocols...",
+      "Authorizing blacksite access...",
+      "Routing secure connection...",
+      "Boot complete."
+    ];
+
+    const asciiBlock = [
+      " __        __   _                            _          _____ _          ",
+      " \\ \\      / /__| | ___ ___  _ __ ___   ___  | |_ ___   |_   _| |__   ___ ",
+      "  \\ \\ /\\ / / _ \\ |/ __/ _ \\| '_ ` _ \\ / _ \\ | __/ _ \\    | | | '_ \\ / _ \\",
+      "   \\ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |   | | | | | |  __/",
+      "   _\\_/\\_/ \\___|_|\\___\\___/|_| |_| |_|\\___|  \\__\\___/    |_| |_| |_|\\___|",
+      "  / ___|___  _ __ ___  _ __   __ _ _ __  _   _                           ",
+      " | |   / _ \\| '_ ` _ \\| '_ \\ / _` | '_ \\| | | |                          ",
+      " | |__| (_) | | | | | | |_) | (_| | | | | |_| |                          ",
+      "  \\____\\___/|_| |_| |_| .__/ \\__,_|_| |_|\\__, |                          ",
+      "                      |_|                |___/                           "
+    ];
+
+    function runBootSequence() {
+      const log = document.getElementById("bootLog");
+      let i = 0;
+
+      function typeBootLine() {
+        if (i < bootLines.length) {
+          const lineEl = document.createElement("div");
+          lineEl.innerHTML = `<span class="prompt">>_</span> ${bootLines[i]}`;
+          log.appendChild(lineEl);
+          i++;
+          setTimeout(typeBootLine, 700);
+        } else {
+          typeAscii();
+        }
+      }
+
+      function typeAscii() {
+        let j = 0;
+        function nextLine() {
+          if (j < asciiBlock.length) {
+            const lineEl = document.createElement("div");
+            lineEl.textContent = asciiBlock[j];
+            log.appendChild(lineEl);
+            j++;
+            setTimeout(nextLine, 60);
+          } else {
+            setTimeout(() => {
+              document.getElementById("bootScreen").style.display = "none";
+              initSite();
+            }, 1000);
+          }
+        }
+        nextLine();
+      }
+
+      typeBootLine();
+    }
+
+    const headerText = 'THE COMPANY';
+    let hIndex = 0;
+    function typeHeader() {
+      const target = document.getElementById("typedHeader");
+      if (hIndex < headerText.length) {
+        target.innerHTML += headerText.charAt(hIndex);
+        hIndex === 8 ? setTimeout(typeHeader, 800) : setTimeout(typeHeader, 120);
+        hIndex++;
+      }
+    }
+
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+
+      const clickSound = new Audio('https://www.soundjay.com/button/beep-07.wav');
+      clickSound.volume = 0.3;
+      clickSound.play();
+
+      if (tabId === "updates") bootScrollLog();
+      if (tabId === "tasks") bootScrollTasks();
+	  if (tabId === "members") bootScrollMembers();
+      if (tabId === "profile") bootScrollProfile();
+    }
+
+    function logout() {
+      localStorage.removeItem('loggedInUser');
+	  window.location.href = 'logout.html';
+    }
+
+    function bootScrollLog() {
+      const log = document.getElementById("bootLogUpdates");
+      const lines = [
+        "[2024-06-15 13:22] Gang HQ Online",
+        "[2024-06-15 16:47] Awaiting Syndicate Confirmation"
+      ];
+      log.innerHTML = "";
+      let i = 0;
+      function printLine() {
+        if (i < lines.length) {
+          const lineEl = document.createElement("div");
+          lineEl.className = "terminal-line";
+          lineEl.innerHTML = `<span class="prompt">>_</span> ${lines[i]}`;
+          log.appendChild(lineEl);
+          i++;
+          setTimeout(printLine, 900);
+        }
+      }
+      printLine();
+    }
+
+    function bootScrollTasks() {
+      const log = document.getElementById("taskLog");
+      const lines = ["Tony - Mining", "Johnny - Mining", "Austin - Strip Club Runs", "Ben - Mining Supervision"];
+      log.innerHTML = "";
+      let i = 0;
+      function printLine() {
+        if (i < lines.length) {
+          const lineEl = document.createElement("div");
+          lineEl.className = "terminal-line";
+          lineEl.innerHTML = `<span class="prompt">>_</span> ${lines[i]}`;
+          log.appendChild(lineEl);
+          i++;
+          setTimeout(printLine, 900);
+        }
+      }
+      printLine();
+    }
+	
+	function bootScrollMembers() {
+      const log = document.getElementById("membersLog");
+      const members = [
+    {
+      name: "Johnny",
+      img: "johnny.png"
+    },
+    {
+      name: "Austin",
+      img: "austin.png"
+    },
+    {
+      name: "Tony",
+      img: "https://via.placeholder.com/120x120?text=Tony"
+    },
+	{
+      name: "Ben",
+      img: "https://via.placeholder.com/120x120?text=Tony"
+    }
+  ];
+      log.innerHTML = "";
+      let i = 0;
+      function printMember() {
+    if (i < members.length) {
+      const entry = document.createElement("div");
+      entry.className = "terminal-line";
+      entry.innerHTML = `
+        <div style="text-align: center; margin-bottom: 20px;">
+          <img src="${members[i].img}" alt="${members[i].name}" style="width: 120px; border: 1px solid #0f0; box-shadow: 0 0 4px #0f0; margin-bottom: 10px;">
+          <div><span class="prompt">>_</span> ${members[i].name}</div>
+        </div>
+      `;
+      log.appendChild(entry);
+      i++;
+      setTimeout(printMember, 1000);
+    }
+  }
+
+  printMember();
+}
+
+    function bootScrollProfile() {
+      const log = document.getElementById("profileLog");
+      const username = localStorage.getItem('loggedInUser') || 'anonymous';
+      const lines = [
+        `User: ${username}`,
+        "Clearance: LEVEL 3",
+        "Access Window: 12:00 - 00:00 PST"
+      ];
+      log.innerHTML = "";
+      let i = 0;
+      function printLine() {
+        if (i < lines.length) {
+          const lineEl = document.createElement("div");
+          lineEl.className = "terminal-line";
+          lineEl.innerHTML = `<span class="prompt">>_</span> ${lines[i]}`;
+          log.appendChild(lineEl);
+          i++;
+          setTimeout(printLine, 900);
+        }
+      }
+      printLine();
+    }
+
+    function initSite() {
+      typeHeader();
+      showTab('home');
+    }
+
+    window.onload = runBootSequence;
+  </script>
+</body>
+</html>

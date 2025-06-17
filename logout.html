@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Logging Out...</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      font-family: 'Courier New', monospace;
+      color: #0f0;
+      font-size: 14px;
+      padding: 20px;
+    }
+
+    .terminal-line {
+      margin-bottom: 8px;
+    }
+
+    .prompt {
+      color: #0f0;
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="logoutLog"></div>
+
+  <script>
+    const logoutLines = [
+      "Logging out...",
+      "Closing encrypted channels...",
+      "Scrubbing session data...",
+      "Wiping trace...",
+      "Disconnecting from HQ...",
+      "Connection terminated."
+    ];
+
+    const asciiGoodbye = [
+      "   ____                 _ _                ",
+      "  / ___| ___   ___   __| | |__  _   _  ___ ",
+      " | |  _ / _ \\ / _ \\ / _` | '_ \\| | | |/ _ \\",
+      " | |_| | (_) | (_) | (_| | |_) | |_| |  __/",
+      "  \\____|\\___/ \\___/ \\__,_|_.__/ \\__, |\\___|",
+      "                                 |___/     "
+    ];
+
+    const logEl = document.getElementById("logoutLog");
+
+    function runLogoutSequence() {
+      let i = 0;
+
+      function nextLine() {
+        if (i < logoutLines.length) {
+          const line = document.createElement("div");
+          line.className = "terminal-line";
+          line.innerHTML = `<span class="prompt">>_</span> ${logoutLines[i]}`;
+          logEl.appendChild(line);
+          i++;
+          setTimeout(nextLine, 700);
+        } else {
+          displayASCII();
+        }
+      }
+
+      function displayASCII() {
+        let j = 0;
+        function drawLine() {
+          if (j < asciiGoodbye.length) {
+            const line = document.createElement("div");
+            line.className = "terminal-line";
+            line.textContent = asciiGoodbye[j];
+            logEl.appendChild(line);
+            j++;
+            setTimeout(drawLine, 60);
+          } else {
+            setTimeout(() => {
+              window.location.href = 'login.html';
+            }, 2000);
+          }
+        }
+        drawLine();
+      }
+
+      nextLine();
+    }
+
+    window.onload = runLogoutSequence;
+  </script>
+</body>
+</html>
