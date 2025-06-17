@@ -87,7 +87,7 @@
 
   <div class="terminal-window">
     <form onsubmit="return login(event);">
-      <label for="username">Username:</label>
+      <label for="username">Email:</label>
       <input type="text" id="username" required />
 
       <label for="password">Password:</label>
@@ -99,7 +99,43 @@
     </form>
   </div>
 
-  <script>
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCpHwGRlmL4jB_7M_4tczjK8fkIVpfiC2Y",
+      authDomain: "gta-site-login-auth.firebaseapp.com",
+      projectId: "gta-site-login-auth",
+      storageBucket: "gta-site-login-auth.firebasestorage.app",
+      messagingSenderId: "846940185465",
+      appId: "1:846940185465:web:c0ee62f9623c33719f85a8",
+      measurementId: "G-8D0FSM5C1K"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.login = async function(event) {
+      event.preventDefault();
+
+      const email = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        localStorage.setItem("loggedInUser", email);
+        window.location.href = "home.html";
+      } catch (error) {
+        console.error("Login error:", error);
+        document.getElementById("message").innerText = "Access Denied.";
+      }
+
+      return false;
+    };
+
+    // Typing effect
     const headerText = 'THE COMPANY';
     let i = 0;
     function typeHeader() {
@@ -119,38 +155,6 @@
     window.onload = () => {
       typeHeader();
     };
-
-    async function login(event) {
-      if (event) event.preventDefault();
-
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-
-      try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbwhx3jc1hWGcDpZkHF9hEkS5lo5NH2c10Wdht4SGiMoO7ZWj_3x7GR4I-6tpN-J0ZcJ/exec", {
-          method: "POST",
-          body: JSON.stringify({ username, password }),
-          headers: {
-            "Content-Type": "application/json"
-          }
-        });
-
-        const text = await response.text();
-        let result = JSON.parse(text);
-
-        if (result.success) {
-          localStorage.setItem("loggedInUser", username);
-          window.location.href = "home.html";
-        } else {
-          document.getElementById("message").innerText = "Access Denied.";
-        }
-      } catch (err) {
-        console.error("Login error:", err);
-        document.getElementById("message").innerText = "Login error. See console.";
-      }
-
-      return false;
-    }
   </script>
 </body>
 </html>
